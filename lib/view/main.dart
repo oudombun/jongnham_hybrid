@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:jongnham_hybrid/providers/restaurants.dart';
 import 'package:jongnham_hybrid/view/screen/detail_screen.dart';
 import 'file:///D:/my_research/Planb/JongNhamHybrid/jongnham_hybrid/lib/view/screen/splash_screen.dart';
 import 'package:jongnham_hybrid/view/screen/home_screen.dart';
-
+import 'package:provider/provider.dart';
 void main() {
   runApp(MyApp());
 }
@@ -10,20 +11,25 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData().copyWith(
-        primaryColor: Colors.red,
-        accentColor: Colors.redAccent,
-        scaffoldBackgroundColor: Colors.white,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: Restaurants())
+      ],
+      child: MaterialApp(
+        theme: ThemeData().copyWith(
+          primaryColor: Colors.red,
+          accentColor: Colors.redAccent,
+          scaffoldBackgroundColor: Colors.white,
+        ),
+        title: 'Jongnhams Hybrid',
+        debugShowCheckedModeBanner: false,
+        initialRoute: HomeScreen.identity,
+        routes: {
+          SplashScreen.identity: (context) => SplashScreen(),
+          HomeScreen.identity: (context) => HomeScreen(),
+          DetailScreen.identity: (context) => DetailScreen(),
+        },
       ),
-      title: 'Jongnhams Hybrid',
-      debugShowCheckedModeBanner: false,
-      initialRoute: HomeScreen.identity,
-      routes: {
-        SplashScreen.identity: (context) => SplashScreen(),
-        HomeScreen.identity: (context) => HomeScreen(),
-        DetailScreen.identity: (context) => DetailScreen(),
-      },
     );
   }
 }

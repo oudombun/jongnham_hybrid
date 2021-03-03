@@ -3,12 +3,12 @@ import 'dart:math';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:jongnham_hybrid/model/restuarant.dart';
+import 'package:jongnham_hybrid/providers/restaurants.dart';
+import 'package:jongnham_hybrid/view/widget/pager.dart';
+import 'package:provider/provider.dart';
 import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 class CustomGoogleMap extends StatefulWidget {
-  final List<LatLng> pinPosition;
-  CustomGoogleMap(
-      {this.pinPosition});
   @override
   _CustomGoogleMapState createState() => _CustomGoogleMapState();
 }
@@ -19,7 +19,7 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
 
   Set<Marker> _markers = {};
 
-  Completer<GoogleMapController> _googleMapController = Completer();
+  GoogleMapController _mapController;
 
   Location location = Location();
 
@@ -28,19 +28,25 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
   PermissionStatus _permissionGranted;
   LocationData _locationData;
 
-
+  List<LatLng> pinPosition;
 
   int current = 0;
   bool isOnPageTurning = false;
   PageController _controller;
+  List<Restaurant> list;
+
   @override
   Widget build(BuildContext context) {
+
+    list = Provider.of<Restaurants>(context).items;
+
     CameraPosition initialLocation = CameraPosition(
       zoom: 14,
       bearing: 20,
       target: LatLng(11.551637, 104.936842),
     );
-    _setMarker();
+
+    _setMarker(list);
     return Stack(
       children: [
         Container(
@@ -59,292 +65,9 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
               height: 100,
               child: PageView(
                 controller: _controller,
-                children: [
-                  Container(width: double.infinity,height: 100,color: Colors.white,
-                    padding: EdgeInsets.all(10),
-                    child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              width: 100,
-                              height: 100,
-                              child: Image.asset(
-                                'assets/images/img3.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              height: 100,
-                              padding: EdgeInsets.all(7),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        child: Text("Happy Herb's Pizza"),
-                                      ),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(2),
-                                        child: Container(
-                                          padding: EdgeInsets.only(left: 4,right: 4),
-                                          decoration: BoxDecoration(
-                                              border: Border.all(color: Colors.grey[400])
-                                          ),
-                                          child: Center(child: Text("2.7 km",style: TextStyle(color: Colors.grey),),),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  Container(
-                                    child: Row(children: [
-                                      Container(
-                                        child: Text(
-                                          "Cambodia",
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                      )
-                                    ],),
-                                  ),
-                                  Container(
-                                    child: Row(
-                                      children: [
-                                        Text("Open now",style: TextStyle(color: Colors.greenAccent,fontSize: 15,fontWeight: FontWeight.bold),),
-                                        Spacer(),
-                                        Icon(
-                                          Icons.assistant_direction,
-                                          color: Colors.blue,
-                                          size: 20,
-                                        ),
-                                      ],mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      )
-                  ),
-                  Container(width: double.infinity,height: 100,color: Colors.white,
-                      padding: EdgeInsets.all(10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              width: 100,
-                              height: 100,
-                              child: Image.asset(
-                                'assets/images/img2.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              height: 100,
-                              padding: EdgeInsets.all(7),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        child: Text("Happy Herb's Pizza"),
-                                      ),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(2),
-                                        child: Container(
-                                          padding: EdgeInsets.only(left: 4,right: 4),
-                                          decoration: BoxDecoration(
-                                              border: Border.all(color: Colors.grey[400])
-                                          ),
-                                          child: Center(child: Text("2.7 km",style: TextStyle(color: Colors.grey),),),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  Container(
-                                    child: Row(children: [
-                                      Container(
-                                        child: Text(
-                                          "Cambodia",
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                      )
-                                    ],),
-                                  ),
-                                  Container(
-                                    child: Row(
-                                      children: [
-                                        Text("Open now",style: TextStyle(color: Colors.greenAccent,fontSize: 15,fontWeight: FontWeight.bold),),
-                                        Spacer(),
-                                        Icon(
-                                          Icons.assistant_direction,
-                                          color: Colors.blue,
-                                          size: 20,
-                                        ),
-                                      ],mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      )
-                  ),
-                  Container(width: double.infinity,height: 100,color: Colors.white,
-                      padding: EdgeInsets.all(10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              width: 100,
-                              height: 100,
-                              child: Image.asset(
-                                'assets/images/img1.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              height: 100,
-                              padding: EdgeInsets.all(7),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        child: Text("Happy Herb's Pizza"),
-                                      ),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(2),
-                                        child: Container(
-                                          padding: EdgeInsets.only(left: 4,right: 4),
-                                          decoration: BoxDecoration(
-                                              border: Border.all(color: Colors.grey[400])
-                                          ),
-                                          child: Center(child: Text("2.7 km",style: TextStyle(color: Colors.grey),),),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  Container(
-                                    child: Row(children: [
-                                      Container(
-                                        child: Text(
-                                          "Cambodia",
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                      )
-                                    ],),
-                                  ),
-                                  Container(
-                                    child: Row(
-                                      children: [
-                                        Text("Open now",style: TextStyle(color: Colors.greenAccent,fontSize: 15,fontWeight: FontWeight.bold),),
-                                        Spacer(),
-                                        Icon(
-                                          Icons.assistant_direction,
-                                          color: Colors.blue,
-                                          size: 20,
-                                        ),
-                                      ],mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      )
-                  ),
-                  Container(width: double.infinity,height: 100,color: Colors.white,
-                      padding: EdgeInsets.all(10),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Container(
-                              width: 100,
-                              height: 100,
-                              child: Image.asset(
-                                'assets/images/img3.jpg',
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              height: 100,
-                              padding: EdgeInsets.all(7),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Container(
-                                        child: Text("Happy Herb's Pizza"),
-                                      ),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(2),
-                                        child: Container(
-                                          padding: EdgeInsets.only(left: 4,right: 4),
-                                          decoration: BoxDecoration(
-                                              border: Border.all(color: Colors.grey[400])
-                                          ),
-                                          child: Center(child: Text("2.7 km",style: TextStyle(color: Colors.grey),),),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                  Container(
-                                    child: Row(children: [
-                                      Container(
-                                        child: Text(
-                                          "Cambodia",
-                                          style: TextStyle(color: Colors.grey),
-                                        ),
-                                      )
-                                    ],),
-                                  ),
-                                  Container(
-                                    child: Row(
-                                      children: [
-                                        Text("Open now",style: TextStyle(color: Colors.greenAccent,fontSize: 15,fontWeight: FontWeight.bold),),
-                                        Spacer(),
-                                        Icon(
-                                          Icons.assistant_direction,
-                                          color: Colors.blue,
-                                          size: 20,
-                                        ),
-                                      ],mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      )
-                  )
-                ],
+                children: list.map((e) {
+                  return Pager(title: e.name,image: e.image);
+                }).toList(),
               ),
             )
         )
@@ -354,13 +77,13 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
 
 
 
-  _setMarker() {
+  _setMarker(List<Restaurant> list) {
     setState(() {
       _markers.clear();
-      if (widget.pinPosition != null){
-        this._markers = widget.pinPosition.map((e) => Marker(
-            markerId: MarkerId("id"+e.latitude.toString()),
-            position: LatLng(e.latitude, e.longitude),
+      if (list != null){
+        this._markers = list.map((e) => Marker(
+            markerId: MarkerId("id"+e.latLng.latitude.toString()),
+            position: LatLng(e.latLng.latitude, e.latLng.longitude),
             onTap: () {},
           ),
         ).toSet();
@@ -370,30 +93,8 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
 
   _onMapCreated(GoogleMapController controller) {
     setState(() {
-      _googleMapController.complete(controller);
+      _mapController = controller;
     });
-  }
-
-  Widget LoadingComponent(){
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(width: 8),
-              SpinKitRing(
-                color: Colors.red,
-              ),
-              SizedBox(width: 8),
-            ],
-          ),
-          SizedBox(height: 8),
-        ],
-      ),
-    );
   }
 
   @override
@@ -425,7 +126,6 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
 
   void _checkLocationPermission() async {
     _serviceEnabled = await location.serviceEnabled();
-    print('_serviceEnabled : $_serviceEnabled');
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) {
@@ -433,8 +133,6 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
       }
     }
     _permissionGranted = await location.hasPermission();
-    print('_permissionGranted : $_permissionGranted');
-    // SystemChannels.platform.invokeMethod('SystemNavigator.pop');
     if (_permissionGranted == PermissionStatus.DENIED) {
       _permissionGranted = await location.requestPermission();
       if (_permissionGranted != PermissionStatus.GRANTED) {
@@ -456,12 +154,19 @@ class _CustomGoogleMapState extends State<CustomGoogleMap> {
         current = _controller.page.toInt();
         isOnPageTurning = false;
 
+        _mapController.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: list[current].latLng,
+              zoom: 15,
+            ),
+          ),
+        );
       });
     } else if (!isOnPageTurning && current.toDouble() != _controller.page) {
       if ((current.toDouble() - _controller.page).abs() > 0.1) {
         setState(() {
           isOnPageTurning = true;
-
         });
       }
     }
